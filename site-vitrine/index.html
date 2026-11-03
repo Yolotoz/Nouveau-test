@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>L'Atelier Barbier — Coupe & barbe</title>
+  <meta name="description" content="Salon de barbier : coupes homme, taille de barbe, rasage traditionnel. Sur rendez-vous ou sans rendez-vous.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #14110f;
+      --bg-soft: #1d1916;
+      --card: #241f1b;
+      --line: #3a322b;
+      --text: #f4ede4;
+      --muted: #b3a797;
+      --accent: #d9a35b;
+      --accent-ink: #1a140e;
+      --radius: 14px;
+      --max: 1080px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font: 400 16px/1.6 Inter, system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; text-decoration: none; }
+    h1, h2, h3 { font-family: Fraunces, Georgia, serif; line-height: 1.15; font-weight: 800; }
+    .wrap { max-width: var(--max); margin: 0 auto; padding: 0 16px; }
+    .demo {
+      background: var(--accent); color: var(--accent-ink);
+      text-align: center; font-size: 13px; font-weight: 600; padding: 6px 16px;
+    }
+
+    /* En-tête */
+    header {
+      position: sticky; top: 0; z-index: 20;
+      background: color-mix(in srgb, var(--bg) 88%, transparent);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--line);
+    }
+    .nav { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+    .logo { font-family: Fraunces, serif; font-weight: 800; font-size: 20px; letter-spacing: .3px; }
+    .logo span { color: var(--accent); }
+    .links { display: flex; gap: 28px; font-weight: 500; color: var(--muted); }
+    .links a:hover { color: var(--text); }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      background: var(--accent); color: var(--accent-ink);
+      font-weight: 600; padding: 12px 22px; border-radius: 999px;
+      transition: transform .15s ease, filter .15s ease;
+    }
+    .btn:hover { transform: translateY(-1px); filter: brightness(1.08); }
+    .btn.ghost { background: transparent; color: var(--text); border: 1px solid var(--line); }
+    .menu-toggle { display: none; background: none; border: 0; color: var(--text); font-size: 26px; cursor: pointer; }
+
+    /* Accueil */
+    .hero { padding: 96px 0 80px; position: relative; overflow: hidden; }
+    .hero::before {
+      content: ""; position: absolute; inset: -40% -10% auto auto; width: 620px; height: 620px;
+      background: radial-gradient(circle, color-mix(in srgb, var(--accent) 22%, transparent), transparent 65%);
+      pointer-events: none;
+    }
+    .eyebrow { color: var(--accent); font-weight: 600; letter-spacing: 2px; text-transform: uppercase; font-size: 13px; }
+    .hero h1 { font-size: clamp(40px, 7vw, 72px); margin: 14px 0 20px; max-width: 760px; }
+    .hero p { color: var(--muted); font-size: 18px; max-width: 540px; }
+    .cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px; }
+    .facts { display: flex; flex-wrap: wrap; gap: 36px; margin-top: 56px; }
+    .facts strong { display: block; font-family: Fraunces, serif; font-size: 30px; color: var(--text); }
+    .facts span { color: var(--muted); font-size: 14px; }
+
+    /* Sections */
+    section { padding: 80px 0; }
+    .alt { background: var(--bg-soft); border-block: 1px solid var(--line); }
+    .head { margin-bottom: 40px; }
+    .head h2 { font-size: clamp(30px, 4.5vw, 44px); margin-top: 8px; }
+
+    .services { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+    .service {
+      background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+      padding: 24px; display: flex; flex-direction: column; gap: 8px;
+    }
+    .service .top { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+    .service h3 { font-size: 21px; }
+    .price { color: var(--accent); font-weight: 600; font-size: 18px; white-space: nowrap; }
+    .service p { color: var(--muted); font-size: 15px; }
+    .duration { margin-top: auto; padding-top: 8px; font-size: 13px; color: var(--muted); }
+
+    .why { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 28px; }
+    .why .icon {
+      width: 48px; height: 48px; border-radius: 12px; display: grid; place-items: center;
+      background: color-mix(in srgb, var(--accent) 15%, transparent); color: var(--accent); font-size: 22px;
+      margin-bottom: 14px;
+    }
+    .why h3 { font-size: 20px; margin-bottom: 6px; }
+    .why p { color: var(--muted); font-size: 15px; }
+
+    .info { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .panel { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 28px; }
+    .panel h3 { font-size: 22px; margin-bottom: 16px; }
+    .hours { list-style: none; }
+    .hours li { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px dashed var(--line); }
+    .hours li:last-child { border-bottom: 0; }
+    .hours .closed { color: var(--muted); }
+    .hours .today { color: var(--accent); font-weight: 600; }
+    .contact-list { list-style: none; display: grid; gap: 14px; margin-bottom: 24px; }
+    .contact-list small { display: block; color: var(--muted); font-size: 13px; }
+
+    footer { padding: 32px 0; color: var(--muted); font-size: 14px; border-top: 1px solid var(--line); }
+    footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; }
+
+    /* Téléphone */
+    @media (max-width: 760px) {
+      .menu-toggle { display: block; }
+      .links {
+        display: none; position: absolute; top: 64px; left: 0; right: 0;
+        flex-direction: column; gap: 0; background: var(--bg); border-bottom: 1px solid var(--line);
+      }
+      .links.open { display: flex; }
+      .links a { padding: 16px; border-top: 1px solid var(--line); }
+      .nav .btn { display: none; }
+      .hero { padding: 64px 0 56px; }
+      section { padding: 56px 0; }
+      .info { grid-template-columns: 1fr; }
+      .cta .btn { flex: 1 1 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="demo">Site de démonstration : entreprise fictive</div>
+
+  <header>
+    <nav class="wrap nav" aria-label="Navigation principale">
+      <a class="logo" href="#">L'Atelier <span>Barbier</span></a>
+      <div class="links" id="links">
+        <a href="#services">Prestations</a>
+        <a href="#pourquoi">Le salon</a>
+        <a href="#infos">Horaires & accès</a>
+      </div>
+      <a class="btn" href="tel:+33100000000">Réserver</a>
+      <button class="menu-toggle" id="menu" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="links">☰</button>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="wrap">
+        <div class="eyebrow">Barbier · Coupe homme</div>
+        <h1>La coupe nette, le temps d'un café.</h1>
+        <p>Coupes classiques et modernes, taille de barbe au rasoir et rasage traditionnel à la serviette chaude. Avec ou sans rendez-vous.</p>
+        <div class="cta">
+          <a class="btn" href="tel:+33100000000">📞 Prendre rendez-vous</a>
+          <a class="btn ghost" href="#services">Voir les tarifs</a>
+        </div>
+        <div class="facts">
+          <div><strong>30 min</strong><span>pour une coupe complète</span></div>
+          <div><strong>6 j/7</strong><span>du mardi au dimanche</span></div>
+          <div><strong>Dès 18 €</strong><span>coupe enfant</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="alt" id="services">
+      <div class="wrap">
+        <div class="head">
+          <div class="eyebrow">Prestations</div>
+          <h2>Tarifs simples, sans surprise</h2>
+        </div>
+        <div class="services">
+          <article class="service">
+            <div class="top"><h3>Coupe homme</h3><span class="price">25 €</span></div>
+            <p>Shampoing, coupe aux ciseaux ou à la tondeuse, coiffage.</p>
+            <span class="duration">⏱ 30 min</span>
+          </article>
+          <article class="service">
+            <div class="top"><h3>Taille de barbe</h3><span class="price">18 €</span></div>
+            <p>Mise en forme, contours au rasoir, huile et baume.</p>
+            <span class="duration">⏱ 20 min</span>
+          </article>
+          <article class="service">
+            <div class="top"><h3>Coupe + barbe</h3><span class="price">38 €</span></div>
+            <p>La formule complète pour repartir impeccable.</p>
+            <span class="duration">⏱ 50 min</span>
+          </article>
+          <article class="service">
+            <div class="top"><h3>Rasage traditionnel</h3><span class="price">30 €</span></div>
+            <p>Serviette chaude, mousse au blaireau, rasoir droit.</p>
+            <span class="duration">⏱ 35 min</span>
+          </article>
+          <article class="service">
+            <div class="top"><h3>Coupe enfant</h3><span class="price">18 €</span></div>
+            <p>Jusqu'à 12 ans, avec patience et bonne humeur.</p>
+            <span class="duration">⏱ 20 min</span>
+          </article>
+          <article class="service">
+            <div class="top"><h3>Dégradé américain</h3><span class="price">28 €</span></div>
+            <p>Fondu précis à la tondeuse, finitions au rasoir.</p>
+            <span class="duration">⏱ 40 min</span>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="pourquoi">
+      <div class="wrap">
+        <div class="head">
+          <div class="eyebrow">Le salon</div>
+          <h2>Pourquoi on revient chez nous</h2>
+        </div>
+        <div class="why">
+          <div><div class="icon">✂</div><h3>Un vrai savoir-faire</h3><p>Des barbiers formés aux techniques classiques comme aux coupes tendance.</p></div>
+          <div><div class="icon">☕</div><h3>On prend le temps</h3><p>Un café offert, une ambiance calme, et pas de travail à la chaîne.</p></div>
+          <div><div class="icon">🌿</div><h3>Bons produits</h3><p>Des soins pour barbe et cheveux choisis pour leur qualité.</p></div>
+          <div><div class="icon">📍</div><h3>Facile d'accès</h3><p>En centre-ville, à deux pas du parking et des transports.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="alt" id="infos">
+      <div class="wrap">
+        <div class="head">
+          <div class="eyebrow">Infos pratiques</div>
+          <h2>Horaires & accès</h2>
+        </div>
+        <div class="info">
+          <div class="panel">
+            <h3>Horaires</h3>
+            <ul class="hours" id="hours">
+              <li data-day="1"><span>Lundi</span><span class="closed">Fermé</span></li>
+              <li data-day="2"><span>Mardi</span><span>9h – 19h</span></li>
+              <li data-day="3"><span>Mercredi</span><span>9h – 19h</span></li>
+              <li data-day="4"><span>Jeudi</span><span>9h – 20h</span></li>
+              <li data-day="5"><span>Vendredi</span><span>9h – 20h</span></li>
+              <li data-day="6"><span>Samedi</span><span>8h30 – 18h</span></li>
+              <li data-day="0"><span>Dimanche</span><span>9h – 13h</span></li>
+            </ul>
+          </div>
+          <div class="panel">
+            <h3>Nous trouver</h3>
+            <ul class="contact-list">
+              <li><small>Adresse</small>12 rue de l'Exemple, 00000 Ville</li>
+              <li><small>Téléphone</small><a href="tel:+33100000000">01 00 00 00 00</a></li>
+              <li><small>E-mail</small><a href="mailto:contact@exemple.fr">contact@exemple.fr</a></li>
+            </ul>
+            <a class="btn" href="tel:+33100000000">📞 Appeler le salon</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <span>© <span id="year"></span> L'Atelier Barbier</span>
+      <span>Site réalisé à titre de démonstration</span>
+    </div>
+  </footer>
+
+  <script>
+    // Menu sur téléphone
+    const menu = document.getElementById('menu');
+    const links = document.getElementById('links');
+    menu.addEventListener('click', () => {
+      const open = links.classList.toggle('open');
+      menu.setAttribute('aria-expanded', String(open));
+      menu.textContent = open ? '✕' : '☰';
+    });
+    links.addEventListener('click', (e) => {
+      if (e.target.tagName === 'A') {
+        links.classList.remove('open');
+        menu.setAttribute('aria-expanded', 'false');
+        menu.textContent = '☰';
+      }
+    });
+
+    // Met en avant le jour actuel dans les horaires
+    const today = document.querySelector(`#hours li[data-day="${new Date().getDay()}"]`);
+    if (today) today.classList.add('today');
+
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
