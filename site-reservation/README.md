@@ -2,7 +2,7 @@
 
 Un site pour commerce (ici un barbier fictif) avec **prise de rendez-vous en ligne** et **espace gérant**.
 
-🔗 **Démo en ligne :** https://yolotoz.github.io/Nouveau-test/site-reservation/public/
+🔗 **Démo en ligne :** https://yolotoz.github.io/portfolio/site-reservation/public/
 (espace gérant : bouton en bas de page, mot de passe `demo`)
 
 ## Pour les clients du commerce

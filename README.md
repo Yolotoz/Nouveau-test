@@ -2,6 +2,10 @@
 
 Des exemples concrets de ce que je réalise pour mes clients. Chaque projet est complet, documenté et prêt à être adapté.
 
+**Démos en ligne :**
+- 🌐 Site vitrine : https://yolotoz.github.io/portfolio/site-vitrine/
+- 📅 Site avec réservation : https://yolotoz.github.io/portfolio/site-reservation/public/ (espace gérant : mot de passe `demo`)
+
 | Projet | Ce que c'est | Pour qui |
 |---|---|---|
 | 🎮 [**Système Tycoon Roblox**](roblox-tycoon/) | Argent, boutique, sauvegarde, Game Pass et achats intégrés, interface mobile | Créateurs de jeux Roblox |
