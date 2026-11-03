@@ -3,18 +3,9 @@
 
 import { CONFIG } from './config.js';
 
-export const DAY_NAMES = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
-const MONTHS = ['janv.', 'févr.', 'mars', 'avr.', 'mai', 'juin', 'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.'];
-
 export function toMinutes(hhmm) {
   const [h, m] = hhmm.split(':').map(Number);
   return h * 60 + m;
-}
-
-export function formatMinutes(total) {
-  const h = Math.floor(total / 60);
-  const m = total % 60;
-  return `${h}h${String(m).padStart(2, '0')}`;
 }
 
 /** Date locale → "AAAA-MM-JJ" */
@@ -31,13 +22,6 @@ export function parseDateKey(key) {
   const [y, m, d] = key.split('-').map(Number);
   const date = new Date(y, m - 1, d);
   return dateKey(date) === key ? date : null;
-}
-
-export function formatDate(key, { long = false } = {}) {
-  const date = parseDateKey(key);
-  if (!date) return key;
-  const day = DAY_NAMES[date.getDay()];
-  return `${long ? day : day.slice(0, 3) + '.'} ${date.getDate()} ${MONTHS[date.getMonth()]}`;
 }
 
 export function getService(id) {
@@ -105,22 +89,22 @@ export function normalizePhone(raw) {
 
 /**
  * Vérifie une demande de réservation.
- * @returns {{ ok: true, booking: object } | { ok: false, error: string, code: string }}
+ * @returns {{ ok: true, booking: object } | { ok: false, code: 'invalid'|'taken', field?: string, error: string }}
  */
 export function validateBooking(input, bookingsOfDay, now = new Date()) {
   const service = getService(input?.serviceId);
-  if (!service) return { ok: false, code: 'invalid', error: 'Prestation inconnue.' };
-  if (!parseDateKey(input.date)) return { ok: false, code: 'invalid', error: 'Date invalide.' };
+  if (!service) return { ok: false, code: 'invalid', field: 'service', error: 'Prestation inconnue.' };
+  if (!parseDateKey(input.date)) return { ok: false, code: 'invalid', field: 'date', error: 'Date invalide.' };
 
   const name = String(input.name ?? '').trim().replace(/\s+/g, ' ');
   if (name.length < 2 || name.length > 60) {
-    return { ok: false, code: 'invalid', error: 'Indique ton nom (2 à 60 caractères).' };
+    return { ok: false, code: 'invalid', field: 'name', error: 'Indique ton nom (2 à 60 caractères).' };
   }
   const phone = normalizePhone(input.phone);
-  if (!phone) return { ok: false, code: 'invalid', error: 'Numéro de téléphone invalide.' };
+  if (!phone) return { ok: false, code: 'invalid', field: 'phone', error: 'Numéro de téléphone invalide.' };
 
   const start = Number(input.start);
-  if (!Number.isInteger(start)) return { ok: false, code: 'invalid', error: 'Créneau invalide.' };
+  if (!Number.isInteger(start)) return { ok: false, code: 'invalid', field: 'start', error: 'Créneau invalide.' };
 
   const free = availableSlots({ date: input.date, serviceId: service.id, bookings: bookingsOfDay, now });
   if (!free.includes(start)) {

@@ -3,9 +3,12 @@
 
 export const CONFIG = {
   businessName: "L'Atelier Barbier",
+  // Langue par défaut du site : 'fr' ou 'en' (le visiteur peut changer avec le bouton FR / EN)
+  defaultLanguage: 'fr',
+  currency: '€',
   phone: '+33100000000',
   phoneDisplay: '01 00 00 00 00',
-  address: "12 rue de l'Exemple, 00000 Ville",
+  address: { fr: "12 rue de l'Exemple, 00000 Ville", en: '12 Example Street, 00000 Town' },
 
   // Précision des créneaux proposés (en minutes)
   slotStep: 15,
@@ -15,12 +18,37 @@ export const CONFIG = {
   minNoticeMinutes: 60,
 
   services: [
-    { id: 'coupe', name: 'Coupe homme', duration: 30, price: 25, description: 'Shampoing, coupe, coiffage.' },
-    { id: 'barbe', name: 'Taille de barbe', duration: 20, price: 18, description: 'Contours au rasoir, huile et baume.' },
-    { id: 'coupe-barbe', name: 'Coupe + barbe', duration: 50, price: 38, description: 'La formule complète.' },
-    { id: 'degrade', name: 'Dégradé américain', duration: 40, price: 28, description: 'Fondu précis, finitions au rasoir.' },
-    { id: 'rasage', name: 'Rasage traditionnel', duration: 35, price: 30, description: 'Serviette chaude, rasoir droit.' },
-    { id: 'enfant', name: 'Coupe enfant', duration: 20, price: 18, description: "Jusqu'à 12 ans." },
+    // name et description : un texte simple, ou { fr: '...', en: '...' } pour un site bilingue
+    {
+      id: 'coupe', duration: 30, price: 25,
+      name: { fr: 'Coupe homme', en: "Men's haircut" },
+      description: { fr: 'Shampoing, coupe, coiffage.', en: 'Wash, cut and styling.' },
+    },
+    {
+      id: 'barbe', duration: 20, price: 18,
+      name: { fr: 'Taille de barbe', en: 'Beard trim' },
+      description: { fr: 'Contours au rasoir, huile et baume.', en: 'Razor line-up, oil and balm.' },
+    },
+    {
+      id: 'coupe-barbe', duration: 50, price: 38,
+      name: { fr: 'Coupe + barbe', en: 'Haircut + beard' },
+      description: { fr: 'La formule complète.', en: 'The full package.' },
+    },
+    {
+      id: 'degrade', duration: 40, price: 28,
+      name: { fr: 'Dégradé américain', en: 'Skin fade' },
+      description: { fr: 'Fondu précis, finitions au rasoir.', en: 'Precise fade, razor finish.' },
+    },
+    {
+      id: 'rasage', duration: 35, price: 30,
+      name: { fr: 'Rasage traditionnel', en: 'Hot towel shave' },
+      description: { fr: 'Serviette chaude, rasoir droit.', en: 'Hot towel, straight razor.' },
+    },
+    {
+      id: 'enfant', duration: 20, price: 18,
+      name: { fr: 'Coupe enfant', en: 'Kids haircut' },
+      description: { fr: "Jusqu'à 12 ans.", en: 'Up to 12 years old.' },
+    },
   ],
 
   // Horaires par jour (0 = dimanche, 1 = lundi...). Plusieurs plages = pause déjeuner.

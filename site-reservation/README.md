@@ -3,7 +3,10 @@
 Un site pour commerce (ici un barbier fictif) avec **prise de rendez-vous en ligne** et **espace gérant**.
 
 🔗 **Démo en ligne :** https://yolotoz.github.io/portfolio/site-reservation/public/
-(espace gérant : bouton en bas de page, mot de passe `demo`)
+🇬🇧 **English demo:** https://yolotoz.github.io/portfolio/site-reservation/public/?lang=en
+(espace gérant / owner area : bouton en bas de page, mot de passe `demo`)
+
+🌍 **Bilingue français / anglais**, avec un bouton FR / EN. La langue par défaut se règle dans `config.js` (`defaultLanguage`).
 
 ## Pour les clients du commerce
 1. Ils choisissent une prestation (prix et durée affichés)
@@ -23,7 +26,7 @@ Un site pour commerce (ici un barbier fictif) avec **prise de rendez-vous en lig
 - Les numéros de téléphone ne sont jamais visibles publiquement
 
 ## Adapter à un nouveau client
-Tout se règle dans **`public/js/config.js`** : nom, adresse, prestations (nom, prix, durée), horaires avec pauses, jours de fermeture, délai minimum avant un rendez-vous, etc.
+Tout se règle dans **`public/js/config.js`** : nom, adresse, langue par défaut, devise, prestations (nom, prix, durée, en une ou deux langues), horaires avec pauses, jours de fermeture, délai minimum avant un rendez-vous, etc.
 
 ## Lancer le site
 
@@ -51,6 +54,7 @@ Sur GitHub Pages (ou en ajoutant `?demo` à l'adresse), le site fonctionne **san
 | Fichier | Rôle |
 |---|---|
 | `public/js/config.js` | Réglages du commerce |
+| `public/js/i18n.js` | Traductions FR / EN, formats de date et d'heure |
 | `public/js/core.js` | Règles de réservation (créneaux, validations), partagées par le site et le serveur |
 | `public/js/api.js` | Communication avec le serveur, ou simulation en mode démo |
 | `public/js/app.js` | Parcours de réservation |

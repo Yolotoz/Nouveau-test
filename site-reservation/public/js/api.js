@@ -33,11 +33,12 @@ const server = {
   },
   async createBooking(payload) {
     const r = await request('api/bookings', { method: 'POST', body: JSON.stringify(payload) });
-    return r.ok ? { ok: true, booking: r.data.booking } : { ok: false, taken: r.status === 409, error: r.data.error };
+    if (r.ok) return { ok: true, booking: r.data.booking };
+    return { ok: false, status: r.status, code: r.data.code, field: r.data.field, error: r.data.error };
   },
   async login(password) {
     const r = await request('api/admin/login', { method: 'POST', body: JSON.stringify({ password }) });
-    return r.ok ? { ok: true } : { ok: false, error: r.data.error };
+    return r.ok ? { ok: true } : { ok: false, status: r.status, error: r.data.error };
   },
   async logout() {
     await request('api/admin/logout', { method: 'POST' });
@@ -132,7 +133,7 @@ const demo = {
   async createBooking(payload) {
     await wait(300);
     const result = validateBooking(payload, confirmedOn(payload.date));
-    if (!result.ok) return { ok: false, taken: result.code === 'taken', error: result.error };
+    if (!result.ok) return { ok: false, status: result.code === 'taken' ? 409 : 400, code: result.code, field: result.field };
     const booking = {
       ...result.booking,
       id: `demo-${Date.now()}`,
@@ -144,7 +145,7 @@ const demo = {
   },
   async login(password) {
     await wait(200);
-    if (password !== DEMO_PASSWORD) return { ok: false, error: 'Mot de passe incorrect (démo : « demo »).' };
+    if (password !== DEMO_PASSWORD) return { ok: false, status: 401 };
     demoLoggedIn = true;
     storageSet(SESSION_KEY, '1');
     return { ok: true };

@@ -1,7 +1,9 @@
 // Espace gérant : connexion, liste des rendez-vous, annulation.
 
-import { dateKey, formatDate, formatMinutes, getService } from './core.js';
+import { CONFIG } from './config.js';
+import { dateKey, getService } from './core.js';
 import { api, DEMO } from './api.js';
+import { formatDate, formatTime, LANG, t, tr, translatePage } from './i18n.js';
 
 const $ = (id) => document.getElementById(id);
 const el = (tag, props = {}, children = []) => {
@@ -9,8 +11,14 @@ const el = (tag, props = {}, children = []) => {
   node.append(...children);
   return node;
 };
+const price = (amount) => (LANG === 'en' ? `${CONFIG.currency}${amount}` : `${amount} ${CONFIG.currency}`);
 
+translatePage();
+document.title = `${CONFIG.businessName} · ${t('admin.title')}`;
 if (DEMO) $('demo-banner').classList.remove('hidden');
+const siteHref = `index.html?lang=${LANG}${new URLSearchParams(location.search).has('demo') ? '&demo' : ''}`;
+$('site-link').href = siteHref;
+$('home-link').href = siteHref;
 
 function show(view) {
   $('login').classList.toggle('hidden', view !== 'login');
@@ -27,13 +35,13 @@ function renderStats(bookings) {
   const week = confirmed.filter((b) => b.date <= limit);
   $('stat-today').textContent = confirmed.filter((b) => b.date === today).length;
   $('stat-week').textContent = week.length;
-  $('stat-revenue').textContent = `${week.reduce((sum, b) => sum + (getService(b.serviceId)?.price ?? 0), 0)} €`;
+  $('stat-revenue').textContent = price(week.reduce((sum, b) => sum + (getService(b.serviceId)?.price ?? 0), 0));
 }
 
 function renderList(bookings) {
   const list = $('list');
   if (!bookings.length) {
-    list.replaceChildren(el('p', { className: 'empty', textContent: 'Aucun rendez-vous à venir.' }));
+    list.replaceChildren(el('p', { className: 'empty', textContent: t('admin.none') }));
     return;
   }
 
@@ -52,11 +60,11 @@ function renderList(bookings) {
           const cancelled = b.status !== 'confirmed';
           const actions = el('div', { className: 'actions' });
           if (cancelled) {
-            actions.append(el('span', { className: 'tag', textContent: 'Annulé' }));
+            actions.append(el('span', { className: 'tag', textContent: t('admin.cancelled') }));
           } else {
-            const cancel = el('button', { type: 'button', className: 'btn small danger', textContent: 'Annuler' });
+            const cancel = el('button', { type: 'button', className: 'btn small danger', textContent: t('admin.cancel') });
             cancel.addEventListener('click', async () => {
-              if (!confirm(`Annuler le rendez-vous de ${b.name} à ${formatMinutes(b.start)} ?`)) return;
+              if (!confirm(t('admin.confirmCancel', { name: b.name, time: formatTime(b.start) }))) return;
               cancel.disabled = true;
               if (await api.cancelBooking(b.id)) load();
               else cancel.disabled = false;
@@ -64,11 +72,11 @@ function renderList(bookings) {
             actions.append(cancel);
           }
           return el('div', { className: `appt${cancelled ? ' cancelled' : ''}` }, [
-            el('div', { className: 'time', textContent: formatMinutes(b.start) }),
+            el('div', { className: 'time', textContent: formatTime(b.start) }),
             el('div', { className: 'who' }, [
               el('strong', { textContent: b.name }),
               el('small', {}, [
-                `${service?.name ?? b.serviceId} · ${b.end - b.start} min · `,
+                `${service ? tr(service.name) : b.serviceId} · ${b.end - b.start} ${t('unit.min')} · `,
                 el('a', { href: `tel:${b.phone}`, textContent: b.phone }),
               ]),
             ]),
@@ -87,9 +95,9 @@ async function load() {
     show('dashboard');
     renderStats(bookings);
     renderList(bookings);
-  } catch (error) {
+  } catch {
     show('dashboard');
-    $('list').replaceChildren(el('p', { className: 'error', textContent: error.message }));
+    $('list').replaceChildren(el('p', { className: 'error', textContent: t('admin.loadError') }));
   }
 }
 
@@ -101,7 +109,8 @@ $('login').addEventListener('submit', async (event) => {
     $('password').value = '';
     load();
   } else {
-    $('login-error').textContent = result.error || 'Connexion impossible.';
+    $('login-error').textContent =
+      result.status === 429 ? t('error.tooMany') : result.status === 503 ? t('admin.disabled') : t('admin.wrongPassword');
   }
 });
 

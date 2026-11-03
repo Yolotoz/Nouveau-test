@@ -4,45 +4,46 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex">
-  <title>Espace gérant — L'Atelier Barbier</title>
+  <title>L'Atelier Barbier</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <div class="demo-banner hidden" id="demo-banner">Démo : mot de passe « demo »</div>
+  <div class="demo-banner hidden" id="demo-banner" data-i18n="demo.adminBanner"></div>
 
   <header>
     <nav class="wrap nav">
-      <a class="logo" href="index.html">L'Atelier <span>Barbier</span></a>
+      <a class="logo" href="index.html" id="home-link">L'Atelier <span>Barbier</span></a>
       <div class="nav-links">
-        <a href="index.html">Voir le site</a>
-        <button class="btn small ghost hidden" id="logout" type="button">Déconnexion</button>
+        <a href="index.html" id="site-link" data-i18n="admin.viewSite"></a>
+        <a class="btn small ghost" id="lang-toggle" href="?lang=en">EN</a>
+        <button class="btn small ghost hidden" id="logout" type="button" data-i18n="admin.logout"></button>
       </div>
     </nav>
   </header>
 
   <main class="wrap admin-main">
     <form class="panel login hidden form" id="login" novalidate>
-      <h3>Espace gérant</h3>
+      <h3 data-i18n="admin.title"></h3>
       <div class="field">
-        <label for="password">Mot de passe</label>
+        <label for="password" data-i18n="admin.password"></label>
         <input id="password" type="password" autocomplete="current-password" required>
       </div>
       <p class="error" id="login-error" role="alert"></p>
-      <button class="btn" type="submit">Se connecter</button>
+      <button class="btn" type="submit" data-i18n="admin.login"></button>
     </form>
 
     <div class="hidden" id="dashboard">
       <div class="toolbar">
-        <h2>Rendez-vous à venir</h2>
-        <button class="btn small ghost" id="refresh" type="button">↻ Actualiser</button>
+        <h2 data-i18n="admin.upcoming"></h2>
+        <button class="btn small ghost" id="refresh" type="button" data-i18n="admin.refresh"></button>
       </div>
       <div class="stats">
-        <div class="stat"><strong id="stat-today">0</strong><span>aujourd'hui</span></div>
-        <div class="stat"><strong id="stat-week">0</strong><span>7 prochains jours</span></div>
-        <div class="stat"><strong id="stat-revenue">0 €</strong><span>CA prévu (7 j)</span></div>
+        <div class="stat"><strong id="stat-today">0</strong><span data-i18n="admin.today"></span></div>
+        <div class="stat"><strong id="stat-week">0</strong><span data-i18n="admin.week"></span></div>
+        <div class="stat"><strong id="stat-revenue">0</strong><span data-i18n="admin.revenue"></span></div>
       </div>
       <div id="list"></div>
     </div>

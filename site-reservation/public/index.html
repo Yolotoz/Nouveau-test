@@ -3,22 +3,23 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>L'Atelier Barbier — Réservation en ligne</title>
-  <meta name="description" content="Réservez votre coupe ou votre taille de barbe en ligne, en quelques secondes.">
+  <title>L'Atelier Barbier</title>
+  <meta name="description" content="Réservez votre coupe ou votre taille de barbe en ligne. Book your haircut online.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <div class="demo-banner hidden" id="demo-banner">Démo : entreprise fictive, les réservations restent dans votre navigateur</div>
+  <div class="demo-banner hidden" id="demo-banner" data-i18n="demo.banner"></div>
 
   <header>
-    <nav class="wrap nav" aria-label="Navigation principale">
+    <nav class="wrap nav" aria-label="Navigation">
       <a class="logo" href="#">L'Atelier <span>Barbier</span></a>
       <div class="nav-links">
-        <a href="#infos">Horaires & accès</a>
-        <a class="btn small" href="#reserver">Réserver</a>
+        <a href="#infos" data-i18n="nav.info"></a>
+        <a class="btn small ghost" id="lang-toggle" href="?lang=en">EN</a>
+        <a class="btn small" href="#reserver" data-i18n="nav.book"></a>
       </div>
     </nav>
   </header>
@@ -26,12 +27,12 @@
   <main>
     <section class="hero">
       <div class="wrap">
-        <div class="eyebrow">Barbier · Réservation en ligne</div>
-        <h1>Ton créneau en 30 secondes.</h1>
-        <p>Choisis ta prestation, ton jour et ton heure. Pas d'appel, pas d'attente : on t'attend.</p>
+        <div class="eyebrow" data-i18n="hero.eyebrow"></div>
+        <h1 data-i18n="hero.title"></h1>
+        <p data-i18n="hero.text"></p>
         <div class="cta">
-          <a class="btn" href="#reserver">📅 Réserver maintenant</a>
-          <a class="btn ghost" href="#infos">Horaires & accès</a>
+          <a class="btn" href="#reserver" data-i18n="hero.cta"></a>
+          <a class="btn ghost" href="#infos" data-i18n="nav.info"></a>
         </div>
       </div>
     </section>
@@ -39,49 +40,49 @@
     <section class="alt" id="reserver">
       <div class="wrap">
         <div class="head">
-          <div class="eyebrow">Réservation</div>
-          <h2>Prendre rendez-vous</h2>
+          <div class="eyebrow" data-i18n="booking.eyebrow"></div>
+          <h2 data-i18n="booking.title"></h2>
         </div>
 
         <div class="booking" id="booking">
           <div id="booking-steps">
             <div class="step" id="step-service">
-              <div class="step-title"><span class="step-num">1</span>Prestation</div>
+              <div class="step-title"><span class="step-num">1</span><span data-i18n="step.service"></span></div>
               <div class="choices" id="services"></div>
             </div>
 
             <div class="step locked" id="step-date">
-              <div class="step-title"><span class="step-num">2</span>Jour</div>
+              <div class="step-title"><span class="step-num">2</span><span data-i18n="step.date"></span></div>
               <div class="dates" id="dates"></div>
             </div>
 
             <div class="step locked" id="step-slot">
-              <div class="step-title"><span class="step-num">3</span>Heure</div>
-              <div class="slots" id="slots"><p class="empty">Choisis d'abord une prestation et un jour.</p></div>
+              <div class="step-title"><span class="step-num">3</span><span data-i18n="step.slot"></span></div>
+              <div class="slots" id="slots"><p class="empty" data-i18n="slots.pickFirst"></p></div>
             </div>
 
             <form class="step locked form" id="step-form" novalidate>
-              <div class="step-title"><span class="step-num">4</span>Tes coordonnées</div>
+              <div class="step-title"><span class="step-num">4</span><span data-i18n="step.details"></span></div>
               <div class="summary" id="summary"></div>
               <div class="field">
-                <label for="name">Nom et prénom</label>
+                <label for="name" data-i18n="form.name"></label>
                 <input id="name" name="name" autocomplete="name" maxlength="60" required>
               </div>
               <div class="field">
-                <label for="phone">Téléphone</label>
+                <label for="phone" data-i18n="form.phone"></label>
                 <input id="phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" placeholder="06 12 34 56 78" required>
               </div>
               <p class="error" id="form-error" role="alert"></p>
-              <button class="btn" type="submit" id="submit">Confirmer le rendez-vous</button>
+              <button class="btn" type="submit" id="submit" data-i18n="form.submit"></button>
             </form>
           </div>
 
           <div class="done hidden" id="done">
             <div class="check">✓</div>
-            <h3>C'est réservé !</h3>
-            <p>On t'attend. En cas d'empêchement, préviens-nous par téléphone.</p>
+            <h3 data-i18n="done.title"></h3>
+            <p data-i18n="done.text"></p>
             <div class="summary" id="done-summary"></div>
-            <button class="btn ghost" type="button" id="again">Faire une autre réservation</button>
+            <button class="btn ghost" type="button" id="again" data-i18n="done.again"></button>
           </div>
         </div>
       </div>
@@ -90,19 +91,19 @@
     <section id="infos">
       <div class="wrap">
         <div class="head">
-          <div class="eyebrow">Infos pratiques</div>
-          <h2>Horaires & accès</h2>
+          <div class="eyebrow" data-i18n="info.eyebrow"></div>
+          <h2 data-i18n="info.title"></h2>
         </div>
         <div class="info">
           <div class="panel">
-            <h3>Horaires</h3>
+            <h3 data-i18n="info.hours"></h3>
             <ul class="hours" id="hours"></ul>
           </div>
           <div class="panel">
-            <h3>Nous trouver</h3>
+            <h3 data-i18n="info.find"></h3>
             <ul class="contact-list">
-              <li><small>Adresse</small><span id="address"></span></li>
-              <li><small>Téléphone</small><a id="phone-link"></a></li>
+              <li><small data-i18n="info.address"></small><span id="address"></span></li>
+              <li><small data-i18n="info.phone"></small><a id="phone-link"></a></li>
             </ul>
           </div>
         </div>
@@ -113,7 +114,7 @@
   <footer>
     <div class="wrap">
       <span>© <span id="year"></span> L'Atelier Barbier</span>
-      <a href="admin.html">Espace gérant</a>
+      <a href="admin.html" id="admin-link" data-i18n="footer.admin"></a>
     </div>
   </footer>
 

@@ -5,6 +5,7 @@ Des exemples concrets de ce que je réalise pour mes clients. Chaque projet est 
 **Démos en ligne :**
 - 🌐 Site vitrine : https://yolotoz.github.io/portfolio/site-vitrine/
 - 📅 Site avec réservation : https://yolotoz.github.io/portfolio/site-reservation/public/ (espace gérant : mot de passe `demo`)
+- 🇬🇧 Booking site, English version: https://yolotoz.github.io/portfolio/site-reservation/public/?lang=en
 
 | Projet | Ce que c'est | Pour qui |
 |---|---|---|

@@ -144,7 +144,7 @@ section { padding: 72px 0; }
 .panel { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; }
 .panel h3 { font-size: 22px; margin-bottom: 14px; }
 .hours { list-style: none; }
-.hours li { display: flex; justify-content: space-between; gap: 12px; padding: 9px 0; border-bottom: 1px dashed var(--line); }
+.hours li { display: flex; justify-content: space-between; gap: 12px; text-align: right; padding: 9px 0; border-bottom: 1px dashed var(--line); }
 .hours li:last-child { border-bottom: 0; }
 .hours .closed { color: var(--muted); }
 .hours .today { color: var(--accent); font-weight: 600; }
@@ -165,11 +165,11 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; g
 .day-group + .day-group { margin-top: 24px; }
 .day-group h3 { font-size: 18px; margin-bottom: 10px; color: var(--accent); }
 .appt {
-  display: grid; grid-template-columns: 70px 1fr auto; align-items: center; gap: 12px;
+  display: grid; grid-template-columns: 86px 1fr auto; align-items: center; gap: 12px;
   background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px;
 }
 .appt + .appt { margin-top: 8px; }
-.appt .time { font-weight: 600; font-size: 17px; }
+.appt .time { font-weight: 600; font-size: 16px; white-space: nowrap; }
 .appt .who { min-width: 0; }
 .appt .who small { display: block; color: var(--muted); }
 .appt.cancelled { opacity: .5; }
@@ -182,10 +182,11 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; g
   section { padding: 52px 0; }
   .booking { padding: 18px 14px; border-radius: 16px; }
   .info { grid-template-columns: 1fr; }
+  .hours li { font-size: 15px; }
   .stats { grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
   .stat { padding: 12px; }
   .stat strong { font-size: 22px; }
-  .appt { grid-template-columns: 56px 1fr; }
+  .appt { grid-template-columns: 78px 1fr; }
   .appt .actions { grid-column: 1 / -1; }
   .appt .actions .btn { width: 100%; }
 }

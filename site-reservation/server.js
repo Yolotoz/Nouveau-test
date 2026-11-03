@@ -76,7 +76,9 @@ export function createApp({ db, adminPassword, now = () => new Date() }) {
     // se suivent sans interruption, donc deux clients ne peuvent pas prendre le même créneau.
     const result = validateBooking(req.body, existing, now());
     if (!result.ok) {
-      return res.status(result.code === 'taken' ? 409 : 400).json({ error: result.error });
+      return res
+        .status(result.code === 'taken' ? 409 : 400)
+        .json({ error: result.error, code: result.code, field: result.field });
     }
     const booking = db.insertBooking(result.booking);
     const { phone, ...publicBooking } = booking;

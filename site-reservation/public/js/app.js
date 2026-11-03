@@ -1,8 +1,9 @@
 // Page publique : affichage des prestations, des horaires et parcours de réservation.
 
 import { CONFIG } from './config.js';
-import { DAY_NAMES, bookableDates, formatDate, formatMinutes, getService, parseDateKey } from './core.js';
+import { bookableDates, getService, parseDateKey } from './core.js';
 import { api, DEMO } from './api.js';
+import { dayName, formatDate, formatTime, LANG, monthName, t, tr, translatePage } from './i18n.js';
 
 const $ = (id) => document.getElementById(id);
 const el = (tag, props = {}, children = []) => {
@@ -12,25 +13,37 @@ const el = (tag, props = {}, children = []) => {
 };
 
 const state = { serviceId: null, date: null, start: null };
+const price = (amount) => (LANG === 'en' ? `${CONFIG.currency}${amount}` : `${amount} ${CONFIG.currency}`);
+const keepLang = (href) => `${href}?lang=${LANG}${DEMO && new URLSearchParams(location.search).has('demo') ? '&demo' : ''}`;
 
 // --- Infos fixes ------------------------------------------------------------
 
+translatePage();
+document.title = `${CONFIG.businessName} · ${t('meta.title')}`;
 if (DEMO) $('demo-banner').classList.remove('hidden');
+$('admin-link').href = keepLang('admin.html');
 $('year').textContent = new Date().getFullYear();
-$('address').textContent = CONFIG.address;
+$('address').textContent = tr(CONFIG.address);
 $('phone-link').textContent = CONFIG.phoneDisplay;
 $('phone-link').href = `tel:${CONFIG.phone}`;
 
 const todayIndex = new Date().getDay();
 for (const day of [1, 2, 3, 4, 5, 6, 0]) {
   const ranges = CONFIG.hours[day] ?? [];
-  const text = ranges.length ? ranges.map(([a, b]) => `${a.replace(':', 'h')} – ${b.replace(':', 'h')}`).join(' · ') : 'Fermé';
+  const text = ranges.length
+    ? ranges.map(([a, b]) => `${formatTime(toMin(a), { compact: true })}–${formatTime(toMin(b), { compact: true })}`).join(' · ')
+    : t('info.closed');
   $('hours').append(
     el('li', { className: day === todayIndex ? 'today' : '' }, [
-      el('span', { textContent: DAY_NAMES[day] }),
+      el('span', { textContent: dayName(day) }),
       el('span', { textContent: text, className: ranges.length ? '' : 'closed' }),
     ]),
   );
+}
+
+function toMin(hhmm) {
+  const [h, m] = hhmm.split(':').map(Number);
+  return h * 60 + m;
 }
 
 // --- Étapes -----------------------------------------------------------------
@@ -49,10 +62,10 @@ function renderServices() {
   for (const service of CONFIG.services) {
     const button = el('button', { type: 'button', className: 'choice' }, [
       el('div', { className: 'row' }, [
-        el('span', { textContent: service.name }),
-        el('span', { className: 'price', textContent: `${service.price} €` }),
+        el('span', { textContent: tr(service.name) }),
+        el('span', { className: 'price', textContent: price(service.price) }),
       ]),
-      el('small', { textContent: `${service.duration} min · ${service.description}` }),
+      el('small', { textContent: `${service.duration} ${t('unit.min')} · ${tr(service.description)}` }),
     ]);
     button.setAttribute('aria-pressed', 'false');
     button.addEventListener('click', () => {
@@ -67,13 +80,12 @@ function renderServices() {
 }
 
 function renderDates() {
-  const months = ['janv.', 'févr.', 'mars', 'avr.', 'mai', 'juin', 'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.'];
   for (const key of bookableDates()) {
     const date = parseDateKey(key);
     const button = el('button', { type: 'button', className: 'date' }, [
-      el('div', { className: 'dow', textContent: DAY_NAMES[date.getDay()].slice(0, 3) }),
+      el('div', { className: 'dow', textContent: dayName(date.getDay()).slice(0, 3) }),
       el('div', { className: 'day', textContent: String(date.getDate()) }),
-      el('div', { className: 'month', textContent: months[date.getMonth()] }),
+      el('div', { className: 'month', textContent: monthName(date.getMonth()) }),
     ]);
     button.setAttribute('aria-pressed', 'false');
     button.setAttribute('aria-label', formatDate(key, { long: true }));
@@ -94,7 +106,7 @@ async function loadSlots() {
   unlock('step-form', false);
 
   const container = $('slots');
-  container.replaceChildren(el('p', { className: 'empty', textContent: 'Chargement des créneaux…' }));
+  container.replaceChildren(el('p', { className: 'empty', textContent: t('slots.loading') }));
   const requestId = ++slotsRequest;
 
   let slots;
@@ -102,19 +114,19 @@ async function loadSlots() {
     slots = await api.getSlots(state.date, state.serviceId);
   } catch {
     if (requestId === slotsRequest) {
-      container.replaceChildren(el('p', { className: 'empty', textContent: 'Impossible de charger les créneaux. Réessaie.' }));
+      container.replaceChildren(el('p', { className: 'empty', textContent: t('slots.error') }));
     }
     return;
   }
-  if (requestId !== slotsRequest) return; // une autre demande plus récente est en cours
+  if (requestId !== slotsRequest) return; // une demande plus récente est en cours
 
   if (!slots.length) {
-    container.replaceChildren(el('p', { className: 'empty', textContent: 'Plus de créneau libre ce jour-là. Essaie un autre jour.' }));
+    container.replaceChildren(el('p', { className: 'empty', textContent: t('slots.none') }));
     return;
   }
   container.replaceChildren(
     ...slots.map((start) => {
-      const button = el('button', { type: 'button', className: 'slot', textContent: formatMinutes(start) });
+      const button = el('button', { type: 'button', className: 'slot', textContent: formatTime(start) });
       button.setAttribute('aria-pressed', 'false');
       button.addEventListener('click', () => {
         state.start = start;
@@ -132,18 +144,25 @@ async function loadSlots() {
 function summaryNodes() {
   const service = getService(state.serviceId);
   return [
-    el('strong', { textContent: service.name }),
-    ` · ${service.duration} min · ${service.price} €`,
+    el('strong', { textContent: tr(service.name) }),
+    ` · ${service.duration} ${t('unit.min')} · ${price(service.price)}`,
     el('br'),
     el('strong', { textContent: formatDate(state.date, { long: true }) }),
-    ` à `,
-    el('strong', { textContent: formatMinutes(state.start) }),
+    ` ${t('form.at')} `,
+    el('strong', { textContent: formatTime(state.start) }),
   ];
 }
 
 function showSummary() {
   $('summary').replaceChildren(...summaryNodes());
   $('form-error').textContent = '';
+}
+
+function errorMessage(result) {
+  if (result.status === 429) return t('error.tooMany');
+  if (result.code === 'taken') return t('error.taken');
+  if (result.field) return t(`error.${result.field}`);
+  return t('error.generic');
 }
 
 // --- Envoi ------------------------------------------------------------------
@@ -153,7 +172,7 @@ $('step-form').addEventListener('submit', async (event) => {
   const submit = $('submit');
   $('form-error').textContent = '';
   submit.disabled = true;
-  submit.textContent = 'Envoi…';
+  submit.textContent = t('form.sending');
 
   try {
     const result = await api.createBooking({
@@ -170,14 +189,14 @@ $('step-form').addEventListener('submit', async (event) => {
       $('done').classList.remove('hidden');
       $('booking').scrollIntoView({ behavior: 'smooth', block: 'start' });
     } else {
-      $('form-error').textContent = result.error || 'Réservation impossible.';
-      if (result.taken) loadSlots();
+      $('form-error').textContent = errorMessage(result);
+      if (result.code === 'taken') loadSlots();
     }
   } catch {
-    $('form-error').textContent = 'Problème de connexion. Réessaie.';
+    $('form-error').textContent = t('error.network');
   } finally {
     submit.disabled = false;
-    submit.textContent = 'Confirmer le rendez-vous';
+    submit.textContent = t('form.submit');
   }
 });
 
