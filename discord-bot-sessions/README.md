@@ -3,7 +3,8 @@
 Un bot qui règle le problème de tous les groupes de joueurs : **organiser une partie sans 50 messages « t'es là ce soir ? »**.
 
 ```
-/session jeu:Valorant heure:21h places:5 note:ranked
+/session jeu:Valorant heure:21h places:5 note:ranked     (français)
+/session game:Valorant time:9pm slots:5 note:ranked      (English)
 ```
 
 Le bot publie une carte avec des boutons **Rejoindre / Quitter / Annuler**, et s'occupe du reste :
@@ -14,10 +15,11 @@ Le bot publie une carte avec des boutons **Rejoindre / Quitter / Annuler**, et s
 - 🕘 **Heure affichée dans le fuseau de chaque joueur** (grâce aux horodatages Discord)
 - 🛡️ Seul l'organisateur ou un modérateur peut annuler
 - 💾 Les sessions sont sauvegardées et survivent à un redémarrage du bot
+- 🌍 **Bilingue français / anglais** : le bot détecte la langue du serveur (messages publics) et de chaque joueur (réponses privées). Les commandes s'affichent aussi dans la bonne langue (`/aide` ou `/help`). Pour forcer une langue : `BOT_LANGUAGE=fr` ou `en` dans `.env`.
 
-Heures acceptées : `21h`, `21h30`, `21:30`, `dans 30 min`, `45min`.
+Heures acceptées : `21h`, `21h30`, `21:30`, `9pm`, `9:30pm`, `dans 30 min`, `in 30 min`, `45min`.
 
-Autres commandes : `/sessions` (prochaines sessions du serveur) et `/aide`.
+Autres commandes : `/sessions` (prochaines sessions du serveur) et `/aide` (`/help`).
 
 ## Installation
 
@@ -41,7 +43,7 @@ Pour qu'il tourne 24 h/24, il faut l'héberger sur un petit serveur (VPS, Railwa
 npm test
 ```
 
-Les tests vérifient la lecture des heures, les inscriptions, la liste d'attente, les rappels et le format des messages, sans connexion à Discord.
+Les tests vérifient la lecture des heures (formats français et anglais), les inscriptions, la liste d'attente, les rappels, les traductions et le format des messages, sans connexion à Discord.
 
 ## Structure
 
@@ -50,6 +52,7 @@ Les tests vérifient la lecture des heures, les inscriptions, la liste d'attente
 | `src/index.js` | Connexion à Discord, commandes, boutons, rappels |
 | `src/sessions.js` | Logique pure : heures, inscriptions, liste d'attente |
 | `src/view.js` | Apparence des messages (cartes et boutons) |
+| `src/i18n.js` | Traductions français / anglais |
 | `src/store.js` | Sauvegarde des sessions dans un fichier JSON |
 | `src/commands.js` | Définition des commandes slash |
 | `src/deploy-commands.js` | Enregistrement des commandes auprès de Discord |

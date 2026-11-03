@@ -5,6 +5,7 @@ import { Client, Events, GatewayIntentBits, MessageFlags, PermissionFlagsBits } 
 import { createSession, dueForReminder, expired, join, leave, parseTime } from './sessions.js';
 import { SessionStore } from './store.js';
 import { helpText, listEmbed, sessionMessage } from './view.js';
+import { langFrom, t } from './i18n.js';
 
 // Les heures tapées par les joueurs sont interprétées dans ce fuseau horaire
 process.env.TZ = process.env.TIMEZONE || 'Europe/Paris';
@@ -18,25 +19,30 @@ const store = new SessionStore(process.env.DATA_FILE || path.resolve('data/sessi
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 const ephemeral = (content) => ({ content, flags: MessageFlags.Ephemeral });
 
+// Langue des réponses privées : celle du joueur. Langue des messages publics : celle du serveur.
+const userLang = (interaction) => langFrom(interaction.locale);
+const serverLang = (interaction) => langFrom(interaction.guildLocale ?? interaction.locale);
+
 // Commandes slash ----------------------------------------------------------
 
 async function handleCommand(interaction) {
+  const lang = userLang(interaction);
   if (!interaction.inGuild()) {
-    return interaction.reply(ephemeral('Ce bot s’utilise dans un serveur.'));
+    return interaction.reply(ephemeral(t(lang, 'reply.guildOnly')));
   }
 
-  if (interaction.commandName === 'aide') {
-    return interaction.reply(ephemeral(helpText));
+  if (interaction.commandName === 'help') {
+    return interaction.reply(ephemeral(helpText(lang)));
   }
 
   if (interaction.commandName === 'sessions') {
-    return interaction.reply({ embeds: [listEmbed(store.upcomingInGuild(interaction.guildId))] });
+    return interaction.reply({ embeds: [listEmbed(store.upcomingInGuild(interaction.guildId), serverLang(interaction))] });
   }
 
   if (interaction.commandName === 'session') {
-    const time = parseTime(interaction.options.getString('heure', true));
+    const time = parseTime(interaction.options.getString('time', true));
     if (!time) {
-      return interaction.reply(ephemeral('Heure non reconnue. Exemples : `21h`, `21h30`, `21:30`, `dans 30 min`.'));
+      return interaction.reply(ephemeral(t(lang, 'reply.badTime')));
     }
 
     const session = createSession({
@@ -44,11 +50,12 @@ async function handleCommand(interaction) {
       guildId: interaction.guildId,
       channelId: interaction.channelId,
       creatorId: interaction.user.id,
-      game: interaction.options.getString('jeu', true),
+      game: interaction.options.getString('game', true),
       time,
-      slots: interaction.options.getInteger('places') ?? 5,
+      slots: interaction.options.getInteger('slots') ?? 5,
+      note: interaction.options.getString('note'),
+      lang: serverLang(interaction),
     });
-    session.note = interaction.options.getString('note') ?? null;
 
     await interaction.reply(sessionMessage(session));
     const message = await interaction.fetchReply();
@@ -60,37 +67,36 @@ async function handleCommand(interaction) {
 // Boutons ------------------------------------------------------------------
 
 async function handleButton(interaction) {
+  const lang = userLang(interaction);
   const [scope, action, id] = interaction.customId.split(':');
   if (scope !== 'session') return;
 
   const session = store.get(id);
   if (!session) {
-    return interaction.reply(ephemeral('Cette session est terminée ou introuvable.'));
+    return interaction.reply(ephemeral(t(lang, 'reply.notFound')));
   }
 
   let feedback;
   if (action === 'join') {
     const result = join(session, interaction.user.id);
     feedback = result.ok
-      ? result.status === 'joined'
-        ? '✅ Tu es inscrit !'
-        : "⏳ C'est complet : tu es en liste d'attente."
-      : result.reason;
+      ? t(lang, result.status === 'joined' ? 'reply.joined' : 'reply.waitlist')
+      : t(lang, `reason.${result.reason}`);
   } else if (action === 'leave') {
     const result = leave(session, interaction.user.id);
-    feedback = result.ok ? 'Tu as quitté la session.' : result.reason;
+    feedback = result.ok ? t(lang, 'reply.left') : t(lang, `reason.${result.reason}`);
     if (result.promoted) {
       interaction.channel
-        ?.send(`🎉 <@${result.promoted}>, une place s'est libérée pour **${session.game}** : tu es inscrit !`)
+        ?.send(t(session.lang ?? 'fr', 'notice.promoted', { user: `<@${result.promoted}>`, game: session.game }))
         .catch(() => {});
     }
   } else if (action === 'cancel') {
     const isModerator = interaction.memberPermissions?.has(PermissionFlagsBits.ManageMessages);
     if (interaction.user.id !== session.creatorId && !isModerator) {
-      return interaction.reply(ephemeral('Seul l’organisateur ou un modérateur peut annuler.'));
+      return interaction.reply(ephemeral(t(lang, 'reply.notOwner')));
     }
     session.cancelled = true;
-    feedback = 'Session annulée.';
+    feedback = t(lang, 'reply.cancelled');
   } else {
     return;
   }
@@ -108,9 +114,12 @@ async function tick() {
     store.set(session);
     try {
       const channel = await client.channels.fetch(session.channelId);
-      const who = session.players.map((p) => `<@${p}>`).join(' ');
       await channel.send(
-        `⏰ **${session.game}** commence <t:${Math.floor(session.time / 1000)}:R> ! ${who}`,
+        t(session.lang ?? 'fr', 'notice.reminder', {
+          game: session.game,
+          when: `<t:${Math.floor(session.time / 1000)}:R>`,
+          players: session.players.map((p) => `<@${p}>`).join(' '),
+        }),
       );
     } catch (error) {
       console.error(`[rappel] Session ${session.id} :`, error.message);
@@ -127,7 +136,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
     else if (interaction.isButton()) await handleButton(interaction);
   } catch (error) {
     console.error('[interaction]', error);
-    const reply = ephemeral('Oups, une erreur est survenue. Réessaie dans un instant.');
+    const reply = ephemeral(t(userLang(interaction), 'reply.error'));
     if (interaction.isRepliable()) {
       (interaction.replied || interaction.deferred ? interaction.followUp(reply) : interaction.reply(reply)).catch(
         () => {},

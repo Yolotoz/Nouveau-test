@@ -5,24 +5,35 @@ export const REMINDER_MINUTES = 10;
 
 /**
  * Transforme une heure tapée par un humain en date.
- * Formats acceptés : "21h", "21h30", "21:30", "9h05", "dans 30 min", "30min".
+ * Formats acceptés : "21h", "21h30", "21:30", "9pm", "9:30pm", "dans 30 min", "in 30 min", "30min".
  * Si l'heure est déjà passée aujourd'hui, on prend celle de demain.
  * @returns {Date|null}
  */
 export function parseTime(input, now = new Date()) {
   const text = String(input).trim().toLowerCase().replace(/\s+/g, ' ');
 
-  const relative = text.match(/^(?:dans )?(\d{1,3}) ?(?:min|mins|minutes?|m)$/);
+  const relative = text.match(/^(?:dans |in )?(\d{1,3}) ?(?:min|mins|minutes?|m)$/);
   if (relative) {
     const minutes = Number(relative[1]);
     if (minutes < 1 || minutes > 24 * 60) return null;
     return new Date(now.getTime() + minutes * 60_000);
   }
 
+  let hours;
+  let minutes;
+  const ampm = text.match(/^(\d{1,2})(?::(\d{2}))? ?(am|pm)$/);
   const clock = text.match(/^(\d{1,2}) ?(?:h|:) ?(\d{2})?$/);
-  if (!clock) return null;
-  const hours = Number(clock[1]);
-  const minutes = clock[2] ? Number(clock[2]) : 0;
+  if (ampm) {
+    hours = Number(ampm[1]);
+    minutes = ampm[2] ? Number(ampm[2]) : 0;
+    if (hours < 1 || hours > 12) return null;
+    hours = (hours % 12) + (ampm[3] === 'pm' ? 12 : 0);
+  } else if (clock) {
+    hours = Number(clock[1]);
+    minutes = clock[2] ? Number(clock[2]) : 0;
+  } else {
+    return null;
+  }
   if (hours > 23 || minutes > 59) return null;
 
   const date = new Date(now);
@@ -33,7 +44,7 @@ export function parseTime(input, now = new Date()) {
   return date;
 }
 
-export function createSession({ id, guildId, channelId, creatorId, game, time, slots }) {
+export function createSession({ id, guildId, channelId, creatorId, game, time, slots, note = null, lang = 'en' }) {
   return {
     id,
     guildId,
@@ -43,6 +54,8 @@ export function createSession({ id, guildId, channelId, creatorId, game, time, s
     game: String(game).slice(0, 100),
     time: time.getTime(),
     slots: Math.min(Math.max(1, Math.floor(slots)), MAX_SLOTS),
+    note: note ? String(note).slice(0, 200) : null,
+    lang,
     players: [creatorId],
     waitlist: [],
     reminded: false,
@@ -52,9 +65,9 @@ export function createSession({ id, guildId, channelId, creatorId, game, time, s
 
 /** Inscrit un joueur ; s'il n'y a plus de place, il passe en liste d'attente. */
 export function join(session, userId) {
-  if (session.cancelled) return { ok: false, reason: 'Cette session est annulée.' };
-  if (session.players.includes(userId)) return { ok: false, reason: 'Tu es déjà inscrit.' };
-  if (session.waitlist.includes(userId)) return { ok: false, reason: "Tu es déjà en liste d'attente." };
+  if (session.cancelled) return { ok: false, reason: 'cancelled' };
+  if (session.players.includes(userId)) return { ok: false, reason: 'alreadyJoined' };
+  if (session.waitlist.includes(userId)) return { ok: false, reason: 'alreadyWaitlist' };
 
   if (session.players.length < session.slots) {
     session.players.push(userId);
@@ -78,7 +91,7 @@ export function leave(session, userId) {
     session.waitlist.splice(inWaitlist, 1);
     return { ok: true, promoted: null };
   }
-  return { ok: false, reason: "Tu n'es pas inscrit." };
+  return { ok: false, reason: 'notJoined' };
 }
 
 /** Sessions dont le rappel doit partir maintenant. */
